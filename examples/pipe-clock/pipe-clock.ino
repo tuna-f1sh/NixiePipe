@@ -7,7 +7,7 @@
 
 #define LED_PIN       6
 #define NUM_PIPES     4
-#define BRIGHTNESS    10
+#define BRIGHTNESS    255
 
 #define COLOUR        CRGB::White
 #define RAINBOW       true // display rainbow digits
@@ -21,9 +21,6 @@ static inline void setTime(tmElements_t tm) {
 }
 
 void setup() {
-  Serial.begin(9600);
-  pipes.passSerial(Serial);
-
   pipes.clear();
   pipes.setBrightness(BRIGHTNESS);
   pipes.setPipeColour(COLOUR);
@@ -36,14 +33,9 @@ void loop() {
 
   EVERY_N_SECONDS(1) {
     if (RTC.read(tm) == 0) {
-      Serial.print(tm.Hour);
-      Serial.print(":");
-      Serial.println(tm.Minute);
       setTime(tm);
     } else {
       // rtc isn't reading
-      Serial.println("RTC read error!  Please check the circuitry.");
-      Serial.println();
       pipes.setNumber(0);
       pipes.writeSolid(CRGB::Red); // all red
       pipes.show();

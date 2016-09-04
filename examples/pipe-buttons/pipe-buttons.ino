@@ -3,43 +3,19 @@
 #include <NixiePipe.h>
 
 #define LED_PIN       6
-#define NUM_PIPES     1
+#define NUM_PIPES     4
 #define BRIGHTNESS    255
 #define FADE_DEC	    20
 
+#define DEBOUNCE       200
 #define FRAMES_PER_SECOND  128
 
 NixiePipe pipes = NixiePipe(NUM_PIPES,LED_PIN);
-uint8_t upFlag = false;
-uint8_t downFlag = false;
 uint8_t gHue = 0;
 
-static void setISR(void) {
-  static unsigned long last_interrupt_time = 0;
-  unsigned long interrupt_time = millis();
-
-  // disable interrupts until acted on
-  noInterrupts();
-
-  // debouce
-  if (interrupt_time - last_interrupt_time > 200) {
-    if (digitalRead(2) == LOW) {
-      upFlag = true;
-    } else if (digitalRead(3) == LOW) {
-      downFlag = true;
-    }
-  } else {
-    interrupts();
-  }
-
-  last_interrupt_time = interrupt_time;
-}
-
 void setup() {
-  attachInterrupt(0, setISR, FALLING);
-  attachInterrupt(1, setISR, FALLING);
-  pinMode(2,INPUT);
-  pinMode(3,INPUT);
+  pinMode(PIPE_TB0,INPUT); // TB0
+  pinMode(PIPE_TB1,INPUT); // TB1
 
   pipes.clear();
   pipes.setBrightness(BRIGHTNESS); 
@@ -47,22 +23,29 @@ void setup() {
 }
 
 void loop() {
+  static unsigned long tb0db = 0;
+  unsigned long tb0int = millis();
+  static unsigned long tb1db = 0;
+  unsigned long tb1int = millis();
 
-  if (upFlag) {
+  if (~digitalRead(PIPE_TB0) & (tb0int - tb0db > DEBOUNCE)) {
     ++pipes;
-    upFlag = false;
+    tb0db = tb0int;
   }
 
-  if (downFlag) {
+  if (~digitalRead(PIPE_TB1) & (tb1int - tb1db > DEBOUNCE)) {
     --pipes;
-    downFlag = false;
+    tb1db = tb1int;
   }
 
   pipes.writeFade(FADE_DEC);
   pipes.writeRainbow(gHue);
 	pipes.show();
-	FastLED.delay(1000/FRAMES_PER_SECOND);
 
 	// do some periodic updates
 	EVERY_N_MILLISECONDS( 20 ) { gHue++; } // slowly cycle the "base color" through the rainbow
+
+	/* FastLED.delay(1000/FRAMES_PER_SECOND);*/
+	delay(1000/FRAMES_PER_SECOND);
+
 }

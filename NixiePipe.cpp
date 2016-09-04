@@ -4,9 +4,6 @@
   #error "NixiePipe requires FastLED 3.0 lib: https://github.com/FastLED/FastLED"
 #endif
 
-inline uint8_t num2idx(uint8_t num) {
-  return (num > 0) ? (num - 1) : 0;
-}
 static inline long powint(int factor, unsigned int exponent)
 {
   long product = 1;
@@ -21,8 +18,9 @@ NixiePipe::NixiePipe(uint8_t n, uint8_t p) : numPipes(n), pin(p), numLEDs(0), pi
   maxNum = powint(10,numPipes) - 1;
 
   pixels = new CRGB[numLEDs]();
-  pipeNum = new uint8_t[numPipes]{0};
-  pipeColour = new CRGB[numPipes]{CRGB::White};
+  pipeNum = new uint8_t[numPipes]();
+  pipeColour = new CRGB[numPipes]();
+  this->setPipeColour(CRGB::White);
   
   FastLED.addLeds<LED_TYPE, 6, COLOR_ORDER>(pixels, numLEDs);
 }
@@ -51,7 +49,7 @@ void NixiePipe::setBrightness(uint8_t nvalue) {
 }
 
 void NixiePipe::setPipeNumber(uint8_t n, uint8_t num) {
-  int16_t newd;
+  int32_t newd = 0;
 
   // can number can be writen
   if (num <= PIXEL_OFFSET) {
@@ -74,16 +72,20 @@ void NixiePipe::setPipeNumber(uint8_t n, uint8_t num) {
 void NixiePipe::setNumber(uint32_t num) {
   uint8_t digit = 0;
   uint8_t i = 0;
-  // pserial->print("setNumber: ");
-  // pserial->println(num);
+  pserial->print("setNumber: ");
+  pserial->println(num);
+  pserial->print("Mod Number: ");
+  pserial->println(this->modNum);
 
-  do {
-    digit = num % 10;
-    num /= 10;
-    this->setPipeNumber(i++,digit);
-  } while (i < this->numPipes);
+  if (num <= this->maxNum) {
+    do {
+      digit = num % 10;
+      num /= 10;
+      this->setPipeNumber(i++,digit);
+    } while (i < this->numPipes);
+  }
 
-  // write leading zeros
+  // write leading zeros (automatically as int number becomes 0)
   // while (i < this->numPipes) {
   //   this->setPipeNumber(i++,digit);
   // }
@@ -132,7 +134,8 @@ void NixiePipe::write(void) {
     if (pipeNum[i] > 0)
       ppipe[NUM2IDX(pipeNum[i])] = pipeColour[i];
     else
-      this->writePipeFill(i,pipeColour[i]);
+      // this->writePipeFill(i,pipeColour[i]);
+      this->clearPipe(i);
   }
 }
 
@@ -148,7 +151,8 @@ void NixiePipe::writeFade(uint8_t step) {
     if (pipeNum[i] > 0)
       ppipe[NUM2IDX(pipeNum[i])] = pipeColour[i];
     else
-      this->writePipeFill(i,pipeColour[i]);
+      // this->writePipeFill(i,pipeColour[i]);
+      this->clearPipe(i);
     fadeLightBy(&ppipe[pipeNum[i]-1],1,step);
   }
 }
@@ -166,7 +170,8 @@ void NixiePipe::writeRainbow(uint8_t gHue) {
     if (pipeNum[i] > 0)
       ppipe[NUM2IDX(pipeNum[i])] = hsv;
     else
-      this->writePipeFill(i,rgb);
+      // this->writePipeFill(i,rgb);
+      this->clearPipe(i);
   }
 }
 
@@ -207,7 +212,7 @@ CRGBSet NixiePipe::getPipe(uint8_t n) {
 NixiePipe& NixiePipe::operator++() {
   uint32_t temp = this->modNum;
   if (temp < this->maxNum )
-    temp++;
+    ++temp;
   else
     temp = 0;
   this->setNumber(temp);
@@ -223,7 +228,7 @@ NixiePipe NixiePipe::operator++(int) {
 NixiePipe& NixiePipe::operator--() {
   uint32_t temp = this->modNum;
   if (temp > 0)
-    temp--;
+    --temp;
   else
     temp = this->maxNum;
   this->setNumber(temp);
@@ -237,18 +242,17 @@ NixiePipe NixiePipe::operator--(int) {
 }
 
 NixiePipe& NixiePipe::shift(int8_t n) {
-  // NixiePipe tmp = *this;
   int idx = 0;
 
   if (n >= 0) {
     for(int i = (this->numPipes - 1); i >= 0; i--) {
       idx = i - n;
-      this->pipeNum[i] = (idx >= 0 && idx < this->numPipes) ? this->pipeNum[idx] : 0;
+      this->setPipeNumber(i,(idx >= 0 && idx < this->numPipes) ? this->pipeNum[idx] : 0);
     }
   } else {
     for(int i = 0; i < this->numPipes; i++) {
       idx = i - n;
-      this->pipeNum[i] = (idx >= 0 && idx < this->numPipes) ? this->pipeNum[idx] : 0;
+      this->setPipeNumber(i,(idx >= 0 && idx < this->numPipes) ? this->pipeNum[idx] : 0);
     }
   }
 

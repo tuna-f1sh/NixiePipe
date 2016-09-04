@@ -14,9 +14,10 @@
 #define COLOR_ORDER         GRB
 #define PIXEL_OFFSET        9 // pixel index offset per module
 
-#define NUM2IDX(x)          PIXEL_OFFSET - x
+#define PIPE_TB0            1
+#define PIPE_TB1            2
 
-inline uint8_t num2idx(uint8_t num);
+#define NUM2IDX(x)          PIXEL_OFFSET - x
 
 class NixiePipe {
   public: 
