@@ -20,7 +20,6 @@ volatile bool incFlag = false;
 
 void cycleUp();
 void cycleDown();
-void counter();
 void cycleBlock();
 void shifter();
 void rainbow();
@@ -34,7 +33,7 @@ NixiePipe pipes = NixiePipe(NUM_PIPES,LED_PIN);
 // List of patterns to cycle through.  Each is defined as a separate function below.
 typedef void (*SimplePatternList[])();
 #if (NUM_PIPES > 3)
-  SimplePatternList gPatterns = { cycleUp, cycleDown, cycleBlock, shifter, rainbow, rainbowWithGlitter, confetti, sinelon, juggle };
+  SimplePatternList gPatterns = { cycleUp, cycleDown, cycleBlock, shifter, rainbow, /*rainbowWithGlitter,*/ confetti, sinelon, juggle };
 #else
   SimplePatternList gPatterns = { shifter, cycleBlock, rainbow, rainbowWithGlitter, confetti, sinelon, juggle };
 #endif
@@ -88,9 +87,6 @@ void cycleDown() {
 	pipes.write();
 }
 
-void counter() {
-  pipes.writeNumber(i);
-}
 
 void cycleBlock() {
   for (int p = 0; p < NUM_PIPES; p++)

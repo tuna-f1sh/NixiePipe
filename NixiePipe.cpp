@@ -56,11 +56,10 @@ void NixiePipe::setPipeNumber(uint8_t n, uint8_t num) {
     newd = num - pipeNum[n];
     newd *= powint(10,n);
     // pserial->print("setPipeNumber: ");
-    // pserial->println(num);
-    // pserial->print("PipeNum: ");
-    // pserial->println(pipeNum[n]);
-    // pserial->print("Newd: ");
-    // pserial->println(newd);
+    // pserial->print(n);
+    // pserial->print(",");
+    // pserial->print(num);
+    // pserial->print(" ");
 
     pipeNum[n] = num; // update number reference
     this->modNum += newd; // update module reference number
@@ -72,10 +71,10 @@ void NixiePipe::setPipeNumber(uint8_t n, uint8_t num) {
 void NixiePipe::setNumber(uint32_t num) {
   uint8_t digit = 0;
   uint8_t i = 0;
-  pserial->print("setNumber: ");
-  pserial->println(num);
-  pserial->print("Mod Number: ");
-  pserial->println(this->modNum);
+  if (pserial != NULL) {
+    pserial->print("setNumber: ");
+    pserial->println(num);
+  }
 
   if (num <= this->maxNum) {
     do {
