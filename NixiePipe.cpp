@@ -52,7 +52,7 @@ void NixiePipe::setPipeNumber(uint8_t n, uint8_t num) {
   int32_t newd = 0;
 
   // can number can be writen
-  if (num <= PIXEL_OFFSET) {
+  if (num < PIXEL_OFFSET) {
     newd = num - pipeNum[n];
     newd *= powint(10,n);
     // pserial->print("setPipeNumber: ");
@@ -130,11 +130,7 @@ void NixiePipe::write(void) {
   
   for (int i=0; i < numPipes; i++) {
     CRGB *ppipe = &pixels[i * PIXEL_OFFSET];
-    if (pipeNum[i] > 0)
-      ppipe[NUM2IDX(pipeNum[i])] = pipeColour[i];
-    else
-      // this->writePipeFill(i,pipeColour[i]);
-      this->clearPipe(i);
+    ppipe[NUM2IDX(pipeNum[i])] = pipeColour[i];
   }
 }
 
@@ -146,12 +142,8 @@ void NixiePipe::writeSolid(CRGB c) {
 void NixiePipe::writeFade(uint8_t step) {
   for (int i = 0;i < numPipes; i++) {
     CRGB *ppipe = &pixels[i * PIXEL_OFFSET];
-    fadeToBlackBy(ppipe,9,step); // turn off all pixels in block
-    if (pipeNum[i] > 0)
-      ppipe[NUM2IDX(pipeNum[i])] = pipeColour[i];
-    else
-      // this->writePipeFill(i,pipeColour[i]);
-      this->clearPipe(i);
+    fadeToBlackBy(ppipe,PIXEL_OFFSET,step); // turn off all pixels in block
+    ppipe[NUM2IDX(pipeNum[i])] = pipeColour[i];
     fadeLightBy(&ppipe[pipeNum[i]-1],1,step);
   }
 }
@@ -166,11 +158,7 @@ void NixiePipe::writeRainbow(uint8_t gHue) {
 
   for (int i=0; i < numPipes; i++) {
     CRGB *ppipe = &pixels[i * PIXEL_OFFSET];
-    if (pipeNum[i] > 0)
-      ppipe[NUM2IDX(pipeNum[i])] = hsv;
-    else
-      // this->writePipeFill(i,rgb);
-      this->clearPipe(i);
+    ppipe[NUM2IDX(pipeNum[i])] = hsv;
   }
 }
 

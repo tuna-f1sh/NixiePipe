@@ -12,12 +12,12 @@
 
 #define LED_TYPE            WS2812B
 #define COLOR_ORDER         GRB
-#define PIXEL_OFFSET        9 // pixel index offset per module
+#define PIXEL_OFFSET        10 // pixel index offset per module
 
-#define PIPE_TB0            1
-#define PIPE_TB1            2
+#define PIPE_TB0            2
+#define PIPE_TB1            3
 
-#define NUM2IDX(x)          PIXEL_OFFSET - x
+#define NUM2IDX(x)          (PIXEL_OFFSET - 1) - x
 
 class NixiePipe {
   public: 

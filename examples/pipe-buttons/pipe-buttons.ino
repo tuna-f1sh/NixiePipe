@@ -3,7 +3,7 @@
 #include <NixiePipe.h>
 
 #define LED_PIN       6
-#define NUM_PIPES     4
+#define NUM_PIPES     2
 #define BRIGHTNESS    255
 #define FADE_DEC	    20
 

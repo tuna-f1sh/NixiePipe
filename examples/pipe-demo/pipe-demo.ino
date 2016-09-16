@@ -46,14 +46,18 @@ void setup() {
   pipes.clear();
   pipes.setBrightness(BRIGHTNESS);
   pipes.setPipeColour(MAIN_COLOUR);
-  pipes.writeNumber(1);
+  pipes.writeNumber(0);
   pipes.show();
   pipesMax = pipes.getMax();
 }
 
 void loop() {
     // Call the current pattern function once, updating the 'leds' array
-  gPatterns[gCurrentPatternNumber]();
+  /* gPatterns[gCurrentPatternNumber]();*/
+  cycleUp();
+
+  /* CRGB *leds = pipes.getPixels();*/
+  /* leds[9] = CRGB::Red;*/
   incFlag = false;
 
 	// do some periodic updates
