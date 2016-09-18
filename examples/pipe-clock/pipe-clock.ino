@@ -7,6 +7,7 @@
 
 #define LED_PIN       6
 #define NUM_PIPES     4
+#define NUM_UNITS     0
 #define BRIGHTNESS    255
 
 #define COLOUR        CRGB::White
@@ -14,10 +15,13 @@
 
 uint8_t gHue = 0;
 
-NixiePipe pipes = NixiePipe(NUM_PIPES,LED_PIN);
+NixiePipe pipes = NixiePipe(NUM_PIPES,NUM_UNITS,LED_PIN);
 
 static inline void setTime(tmElements_t tm) {
-  pipes.setNumber((tm.Hour * 100) + tm.Minute);
+  if (NUM_PIPES <= 5)
+    pipes.setNumber((tm.Hour * 100) + tm.Minute);
+  else
+    pipes.setNumber((tm.Hour * 10000) + (tm.Minute * 100) + tm.Second);
 }
 
 void setup() {

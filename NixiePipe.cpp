@@ -1,9 +1,11 @@
 #include "NixiePipe.h"
 
+// Error if we can't find FastLED
 #if FASTLED_VERSION < 3000000
   #error "NixiePipe requires FastLED 3.0 lib: https://github.com/FastLED/FastLED"
 #endif
 
+// Calculates int power (math int uses floats)
 static inline long powint(int factor, unsigned int exponent)
 {
   long product = 1;
@@ -12,65 +14,87 @@ static inline long powint(int factor, unsigned int exponent)
   return product;
 }
 
-NixiePipe::NixiePipe(uint8_t n, uint8_t p) : numPipes(n), pin(p), numLEDs(0), pipeNum(0), brightness(0), modNum(0), maxNum(0), pixels(0), pipeColour(0)
+// NixiePipe class constructor
+NixiePipe::NixiePipe(uint8_t n, uint8_t units, uint8_t p) : numPipes(n), numUnits(units), pin(p), numLEDs(0), pipeNum(0), brightness(0), modNum(0), maxNum(0), pixels(0), pipeColour(0)
 {
+  // Fill number of LEDs var
   numLEDs = PIXEL_OFFSET * numPipes;
-  maxNum = powint(10,numPipes) - 1;
+  // Fill maximum displayable number var
+  maxNum = powint(10,(numPipes-numUnits)) - 1;
 
+  // Init pixels
   pixels = new CRGB[numLEDs]();
+  // Init pipe number buffer
   pipeNum = new uint8_t[numPipes]();
+  // Init pipe colour buffer
   pipeColour = new CRGB[numPipes]();
+  // Set the default colour
   this->setPipeColour(CRGB::White);
   
+  // Create the FastLED object
   FastLED.addLeds<LED_TYPE, 6, COLOR_ORDER>(pixels, numLEDs);
 }
 
+// Class destructor
 NixiePipe::~NixiePipe() {
   if(pixels) delete[] pixels;
   if(pipeNum) delete[] pipeNum;
   if(pipeColour) delete[] pipeColour;
 }
 
+// Pass hardware Serial pointer to class
 void NixiePipe::passSerial(HardwareSerial &serial) {
   pserial = &serial;
 }
 
+// Get current displayed number
 uint32_t NixiePipe::getNumber(void) {
   return this->modNum;
 }
 
+// Get maximum displayable number
 uint32_t NixiePipe::getMax(void) {
   return this->maxNum;
 }
 
+// Set brightness
 void NixiePipe::setBrightness(uint8_t nvalue) {
   brightness = nvalue;
   FastLED.setBrightness(brightness);
 }
 
-void NixiePipe::setPipeNumber(uint8_t n, uint8_t num) {
+// Set individual pipe module number
+void NixiePipe::setPipeNumber(uint8_t n /*module*/, uint8_t num /*number*/) {
   int32_t newd = 0;
 
-  // can number can be writen
+  // can number can be writen?
   if (num < PIXEL_OFFSET) {
-    newd = num - pipeNum[n];
-    newd *= powint(10,n);
-    // pserial->print("setPipeNumber: ");
-    // pserial->print(n);
-    // pserial->print(",");
-    // pserial->print(num);
-    // pserial->print(" ");
-
-    pipeNum[n] = num; // update number reference
-    this->modNum += newd; // update module reference number
-    // pserial->print("modNum: ");
-    // pserial->println(modNum);
+    // update the displayed number buffer if it's a number pipe
+    if (n >= this->numUnits) {
+      newd = num - pipeNum[n];
+      newd *= powint(10,(n - this->numUnits));
+      this->modNum += newd; // update module reference number
+    }
+    
+    // update number reference
+    pipeNum[n] = num;
+    
+    // if (pserial != NULL) {
+    //   pserial->print("setPipeNumber: ");
+    //   pserial->println(modNum);
+    //   pserial->print(n);
+    //   pserial->print(",");
+    //   pserial->print(num);
+    //   pserial->print(" ");
+    //   pserial->print("modNum: ");
+    // }
   }
 }
 
+// Set display number (auto decimates digit to modules)
 void NixiePipe::setNumber(uint32_t num) {
   uint8_t digit = 0;
-  uint8_t i = 0;
+  uint8_t i = this->numUnits;
   if (pserial != NULL) {
     pserial->print("setNumber: ");
     pserial->println(num);
@@ -91,6 +115,7 @@ void NixiePipe::setNumber(uint32_t num) {
 
 }
 
+// Set colour, number and write
 void NixiePipe::writePipeNumber(uint8_t n, uint8_t num, CRGB c) {
   this->setPipeColour(n,c);
 
@@ -98,49 +123,58 @@ void NixiePipe::writePipeNumber(uint8_t n, uint8_t num, CRGB c) {
   this->write();
 }
 
+// Set number and write
 void NixiePipe::writePipeNumber(uint8_t n, uint8_t num) {
   this->writePipeNumber(n,num,this->pipeColour[n]);
 }
 
+// Set pipe module colour
 void NixiePipe::setPipeColour(uint8_t n, CRGB c) {
   pipeColour[n] = c;
 }
 
+// Set all pipes' colour
 void NixiePipe::setPipeColour(CRGB c) {
-  for (int i=0; i < numPipes; i++)
+  for (int i = 0; i < this->numPipes; i++)
     this->setPipeColour(i,c);
 }
 
+// Write display number with colour
 void NixiePipe::writeNumber(uint8_t num, CRGB c) {
   this->setNumber(num);
   this->writeSolid(c);
 }
 
+// Write display number
 void NixiePipe::writeNumber(uint8_t num) {
   this->setNumber(num);
   this->write();
 }
 
+// Output and display updates to pipes
 void NixiePipe::show(void) {
   FastLED.show();
 }
 
+// Write new settings to pipes
 void NixiePipe::write(void) {
   this->clear();
   
-  for (int i=0; i < numPipes; i++) {
+  for (int i = 0; i < this->numPipes; i++) {
     CRGB *ppipe = &pixels[i * PIXEL_OFFSET];
     ppipe[NUM2IDX(pipeNum[i])] = pipeColour[i];
   }
 }
 
+// Write new settings and solid colour to pipes
 void NixiePipe::writeSolid(CRGB c) {
   this->setPipeColour(c);
   this->write();
 }
 
+// Write new settings and fade previous
 void NixiePipe::writeFade(uint8_t step) {
-  for (int i = 0;i < numPipes; i++) {
+  for (int i = 0;i < this->numPipes; i++) {
     CRGB *ppipe = &pixels[i * PIXEL_OFFSET];
     fadeToBlackBy(ppipe,PIXEL_OFFSET,step); // turn off all pixels in block
     ppipe[NUM2IDX(pipeNum[i])] = pipeColour[i];
@@ -148,6 +182,7 @@ void NixiePipe::writeFade(uint8_t step) {
   }
 }
 
+// Write new settings with rainbow colour
 void NixiePipe::writeRainbow(uint8_t gHue) {
   CHSV hsv;
   CRGB rgb;
@@ -162,6 +197,7 @@ void NixiePipe::writeRainbow(uint8_t gHue) {
   }
 }
 
+// Fill pipe module with solid colour (used with Black to clear)
 void NixiePipe::writePipeFill(uint8_t n, CRGB c) {
   CRGBSet module = this->getPipe(n);
 
@@ -169,33 +205,39 @@ void NixiePipe::writePipeFill(uint8_t n, CRGB c) {
 }
 
 
+// Fill pipe display with Black (off)
 void NixiePipe::clear(void) {
   CRGBSet pipes(pixels,numLEDs);
 
   pipes.fill_solid(CRGB::Black);
 }
 
+// Fill single pipe module with Black (off)
 void NixiePipe::clearPipe(uint8_t n) {
   CRGBSet module = this->getPipe(n);
 
   module.fill_solid(CRGB::Black);
 }
 
+// Return a pointer to the FastLED pixels
 CRGB* NixiePipe::getPixels() {
   return pixels;
 }
 
+// Return a pointer to module specific FastLED pixels
 CRGB* NixiePipe::getPipePixels(uint8_t n) {
   return &pixels[n * PIXEL_OFFSET];
 }
 
 
+// Return a module pixel array (see FastLED docs)
 CRGBSet NixiePipe::getPipe(uint8_t n) {
   CRGB *ppipe = &pixels[n * PIXEL_OFFSET];
   CRGBSet module(ppipe,PIXEL_OFFSET);
   return module;
 }
 
+// (Pre) Increment overload adds 1 to current display
 NixiePipe& NixiePipe::operator++() {
   uint32_t temp = this->modNum;
   if (temp < this->maxNum )
@@ -206,12 +248,14 @@ NixiePipe& NixiePipe::operator++() {
   return *this;
 }
 
+// (Post) Increment (does not work?)
 NixiePipe NixiePipe::operator++(int) {
   NixiePipe tmp = *this;
   ++*this;
   return tmp;
 }
 
+// (Pre) Decrement overload subtracts 1 from current display
 NixiePipe& NixiePipe::operator--() {
   uint32_t temp = this->modNum;
   if (temp > 0)
@@ -222,24 +266,26 @@ NixiePipe& NixiePipe::operator--() {
   return *this;
 }
 
+// (Post) Decrement (does not work?)
 NixiePipe NixiePipe::operator--(int) {
   NixiePipe tmp = *this;
   --*this;
   return tmp;
 }
 
+// Shift current display (+/-) n digits
 NixiePipe& NixiePipe::shift(int8_t n) {
   int idx = 0;
 
   if (n >= 0) {
-    for(int i = (this->numPipes - 1); i >= 0; i--) {
+    for(int i = (this->numPipes - 1); i >= this->numUnits; i--) {
       idx = i - n;
-      this->setPipeNumber(i,(idx >= 0 && idx < this->numPipes) ? this->pipeNum[idx] : 0);
+      this->setPipeNumber(i,(idx >= this->numUnits && idx < this->numPipes) ? this->pipeNum[idx] : 0);
     }
   } else {
     for(int i = 0; i < this->numPipes; i++) {
       idx = i - n;
-      this->setPipeNumber(i,(idx >= 0 && idx < this->numPipes) ? this->pipeNum[idx] : 0);
+      this->setPipeNumber(i,(idx >= this->numUnits && idx < this->numPipes) ? this->pipeNum[idx] : 0);
     }
   }
 
@@ -247,10 +293,14 @@ NixiePipe& NixiePipe::shift(int8_t n) {
   return *this;
 }
 
-// NixiePipe& operator>>(const NixiePipe &rhs) {
-//   ;;
+// NixiePipe operator+(int rhs) {
+//   this->setPipeNumber(this->modNum + rhs);
+
+//   return this;
 // }
 
-// NixiePipe& operator<<(const NixiePipe &rhs) {
-//   ;;
+// NixiePipe operator-(int rhs) {
+//   this->setPipeNumber(this->modNum - rhs);
+
+//   return this;
 // }

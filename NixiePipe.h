@@ -10,20 +10,50 @@
 
 #include <FastLED.h>
 
+// Led config
 #define LED_TYPE            WS2812B
 #define COLOR_ORDER         GRB
 #define PIXEL_OFFSET        10 // pixel index offset per module
 
+// Touch button arduino pin numbers
 #define PIPE_TB0            2
 #define PIPE_TB1            3
 
+// Conversion from pipe number to LED index
 #define NUM2IDX(x)          (PIXEL_OFFSET - 1) - x
+
+// Index for SI prefix pipe
+typedef enum {
+  Pico,
+  Nano,
+  Micro,
+  Milli,
+  Kila,
+  Mega,
+  Giga,
+  Tera,
+  Neg,
+  Pos
+} Prefix;
+
+// Index for SI units pipe
+typedef enum {
+  Volts,
+  Amps,
+  Watts,
+  Grams,
+  Hertz,
+  Celsius,
+  Newtons,
+  Meters,
+  Seconds,
+  Ohm
+} Unit;
 
 class NixiePipe {
   public: 
 
-    // pass fading flag??
-    NixiePipe(uint8_t n, uint8_t p);
+    NixiePipe(uint8_t n, uint8_t units, uint8_t p);
     ~NixiePipe();
 
     void
@@ -57,17 +87,19 @@ class NixiePipe {
       &operator--(),
       operator++(int),
       operator--(int);
-      // &operator>>(const NixiePipe &rhs),
-      // &operator<<(const NixiePipe &rhs);
+      // operator+(int rhs);
+      // operator-(int rhs);
     uint32_t 
       getNumber(void),
       getMax(void);
+    operator int() {return modNum;}
 
   private:
     const uint8_t
-      numPipes;
-    uint8_t
       pin,
+      numPipes,
+      numUnits;
+    uint8_t
       numLEDs,
       *pipeNum,
       brightness;

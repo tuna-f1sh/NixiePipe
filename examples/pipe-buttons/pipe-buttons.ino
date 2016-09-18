@@ -10,7 +10,7 @@
 #define DEBOUNCE       200
 #define FRAMES_PER_SECOND  128
 
-NixiePipe pipes = NixiePipe(NUM_PIPES,LED_PIN);
+NixiePipe pipes = NixiePipe(NUM_PIPES,0,LED_PIN);
 uint8_t gHue = 0;
 
 void setup() {

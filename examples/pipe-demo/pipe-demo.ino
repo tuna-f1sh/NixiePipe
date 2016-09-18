@@ -3,13 +3,14 @@
 #include <NixiePipe.h>
 
 #define LED_PIN       6
-#define NUM_PIPES     4
+#define NUM_PIPES     5
+#define NUM_UNITS     0
 #define BRIGHTNESS    255
 #define FADE_DEC	    20           // Fade effect delay
 #define INC_DELAY     200          // Delay between number increment in cycles
 #define MAIN_COLOUR   CRGB::OrangeRed
 
-#define FRAMES_PER_SECOND  128
+#define FRAMES_PER_SECOND  250
 #define SEQUENCE_TIME      15      // Time between sequences
 
 uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
@@ -18,17 +19,17 @@ uint8_t i = 0;                     // Master number inc.
 uint32_t pipesMax = 0;             // Max number pipes can show set by pipes.getMax()
 volatile bool incFlag = false;
 
-void cycleUp();
-void cycleDown();
-void cycleBlock();
-void shifter();
-void rainbow();
-void rainbowWithGlitter();
-void confetti();
-void sinelon();
-void juggle();
+static void cycleUp();
+static void cycleDown();
+static void cycleBlock();
+static void shifter();
+static void rainbow();
+static void rainbowWithGlitter();
+static void confetti();
+static void sinelon();
+static void juggle();
 
-NixiePipe pipes = NixiePipe(NUM_PIPES,LED_PIN);
+NixiePipe pipes = NixiePipe(NUM_PIPES,NUM_UNITS,LED_PIN);
 
 // List of patterns to cycle through.  Each is defined as a separate function below.
 typedef void (*SimplePatternList[])();
@@ -40,24 +41,30 @@ typedef void (*SimplePatternList[])();
 
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
+static void nextPattern()
+{
+	// add one to the current pattern number, and wrap around at the end
+	gCurrentPatternNumber = (gCurrentPatternNumber + 1) % ARRAY_SIZE( gPatterns);
+	if (gCurrentPatternNumber == 0) {
+    pipes.writeNumber(i,MAIN_COLOUR);
+  }
+}
+
 void setup() {
   Serial.begin(9600);
-  pipes.passSerial(Serial);
+  /* pipes.passSerial(Serial);*/
   pipes.clear();
   pipes.setBrightness(BRIGHTNESS);
   pipes.setPipeColour(MAIN_COLOUR);
-  pipes.writeNumber(0);
+  pipes.write();
   pipes.show();
   pipesMax = pipes.getMax();
 }
 
 void loop() {
     // Call the current pattern function once, updating the 'leds' array
-  /* gPatterns[gCurrentPatternNumber]();*/
-  cycleUp();
+  gPatterns[gCurrentPatternNumber]();
 
-  /* CRGB *leds = pipes.getPixels();*/
-  /* leds[9] = CRGB::Red;*/
   incFlag = false;
 
 	// do some periodic updates
@@ -70,54 +77,46 @@ void loop() {
   FastLED.delay(1000/FRAMES_PER_SECOND);
 }
 
-void nextPattern()
-{
-	// add one to the current pattern number, and wrap around at the end
-	gCurrentPatternNumber = (gCurrentPatternNumber + 1) % ARRAY_SIZE( gPatterns);
-	if (gCurrentPatternNumber == 0) {
-    pipes.writeNumber(i,MAIN_COLOUR);
-  }
-}
-
-void cycleUp() {
+static void cycleUp() {
   if (incFlag)
     ++pipes;
+    /* pipes.setNumber(i);*/
 	pipes.write();
 }
 
-void cycleDown() {
+static void cycleDown() {
 	if (incFlag)
     --pipes;
 	pipes.write();
 }
 
 
-void cycleBlock() {
+static void cycleBlock() {
   for (int p = 0; p < NUM_PIPES; p++)
     pipes.setPipeNumber(p, i % 10);
     pipes.writeFade(FADE_DEC);
 }
 
-void shifter() {
+static void shifter() {
 	if (incFlag)
     pipes.shift(1);
-	pipes.setPipeNumber(0,i % 10);
+	pipes.setPipeNumber(NUM_UNITS,i % 10);
 	pipes.write();
 }
 
-void rainbow()
+static void rainbow()
 {
 	cycleBlock();
 	pipes.writeRainbow(gHue);
 }
 
-void rainbowWithGlitter()
+static void rainbowWithGlitter()
 {
 	addGlitter(8);
 	rainbow();
 }
 
-void addGlitter( fract8 chanceOfGlitter)
+static void addGlitter( fract8 chanceOfGlitter)
 {
 	CRGB* leds = pipes.getPixels();
 	if( random8() < chanceOfGlitter) {
@@ -125,7 +124,7 @@ void addGlitter( fract8 chanceOfGlitter)
 	}
 }
 
-void confetti()
+static void confetti()
 {
 	CRGB rgb;
 
@@ -135,7 +134,7 @@ void confetti()
 	pipes.writeFade(FADE_DEC);
 }
 
-void sinelon()
+static void sinelon()
 {
 	CRGB rgb;
 
@@ -147,7 +146,7 @@ void sinelon()
 	pipes.writeFade(FADE_DEC);
 }
 
-void juggle() {
+static void juggle() {
 	byte dothue = 0;
 	CRGB rgb;
 	for( int i = 0; i < NUM_PIPES; i++) {

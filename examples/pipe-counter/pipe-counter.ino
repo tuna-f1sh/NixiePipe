@@ -4,6 +4,7 @@
 
 #define LED_PIN       6
 #define NUM_PIPES     4
+#define NUM_UNITS     0
 #define BRIGHTNESS    255
 #define FADE_DEC	    32
 
@@ -12,7 +13,7 @@
 
 #define RAINBOW       false
 
-NixiePipe pipes = NixiePipe(NUM_PIPES,LED_PIN);
+NixiePipe pipes = NixiePipe(NUM_PIPES,NUM_UNITS,LED_PIN);
 uint8_t gHue = 0;
 
 void setup() {
