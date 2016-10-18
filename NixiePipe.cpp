@@ -15,7 +15,7 @@ static inline long powint(int factor, unsigned int exponent)
 }
 
 // NixiePipe class constructor
-NixiePipe::NixiePipe(uint8_t n, uint8_t units, uint8_t p) : numPipes(n), numUnits(units), pin(p), numLEDs(0), pipeNum(0), brightness(0), modNum(0), maxNum(0), pixels(0), pipeColour(0)
+NixiePipe::NixiePipe(uint8_t n, uint8_t units) : numPipes(n), numUnits(units), numLEDs(0), pipeNum(0), brightness(255), modNum(0), maxNum(0), pixels(0), pipeColour(0)
 {
   // Fill number of LEDs var
   numLEDs = PIXEL_OFFSET * numPipes;
@@ -31,8 +31,8 @@ NixiePipe::NixiePipe(uint8_t n, uint8_t units, uint8_t p) : numPipes(n), numUnit
   // Set the default colour
   this->setPipeColour(CRGB::White);
   
-  // Create the FastLED object
-  FastLED.addLeds<LED_TYPE, 6, COLOR_ORDER>(pixels, numLEDs);
+  // Create the FastLED object (now done with begin)
+  /*FastLED.addLeds<LED_TYPE, 6, COLOR_ORDER>(pixels, numLEDs);*/
 }
 
 // Class destructor
@@ -140,13 +140,13 @@ void NixiePipe::setPipeColour(CRGB c) {
 }
 
 // Write display number with colour
-void NixiePipe::writeNumber(uint8_t num, CRGB c) {
+void NixiePipe::writeNumber(uint32_t num, CRGB c) {
   this->setNumber(num);
   this->writeSolid(c);
 }
 
 // Write display number
-void NixiePipe::writeNumber(uint8_t num) {
+void NixiePipe::writeNumber(uint32_t num) {
   this->setNumber(num);
   this->write();
 }

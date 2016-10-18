@@ -10,13 +10,14 @@
 #define DEBOUNCE       200
 #define FRAMES_PER_SECOND  128
 
-NixiePipe pipes = NixiePipe(NUM_PIPES,0,LED_PIN);
+NixiePipe pipes = NixiePipe(NUM_PIPES);
 uint8_t gHue = 0;
 
 void setup() {
   pinMode(PIPE_TB0,INPUT); // TB0
   pinMode(PIPE_TB1,INPUT); // TB1
 
+  pipes.begin<LED_PIN>();
   pipes.clear();
   pipes.setBrightness(BRIGHTNESS); 
   pipes.show();

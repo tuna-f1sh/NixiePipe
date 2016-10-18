@@ -53,11 +53,12 @@ typedef enum {
 class NixiePipe {
   public: 
 
-    NixiePipe(uint8_t n, uint8_t units, uint8_t p);
+    NixiePipe(uint8_t n = 1, uint8_t units = 0);
     ~NixiePipe();
 
+	template< uint8_t DATA_PIN = 6 > void begin(void) { FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(pixels, numLEDs); }
+
     void
-      // begin(void),
       show(void), // FastLED show
       passSerial(HardwareSerial &serial),
       write(void),
@@ -68,8 +69,8 @@ class NixiePipe {
       writePipeNumber(uint8_t n, uint8_t num, CRGB c), // set and clear with colour
       setPipeColour(uint8_t n, CRGB c), // set pipe colour
       setPipeColour(CRGB c), // set pipe colour
-      writeNumber(uint8_t num, CRGB C),
-      writeNumber(uint8_t num),
+      writeNumber(uint32_t num, CRGB C),
+      writeNumber(uint32_t num),
       writeSolid(CRGB c), // set pipe colour
       writeRainbow(uint8_t gHue), // set pipe rainbow
       writePipeFill(uint8_t n, CRGB c),
@@ -96,7 +97,6 @@ class NixiePipe {
 
   private:
     const uint8_t
-      pin,
       numPipes,
       numUnits;
     uint8_t

@@ -17,7 +17,7 @@
 #define RAINBOW       false
 #define MAIN_COLOUR   CRGB::White
 
-NixiePipe pipes = NixiePipe(NUM_PIPES,NUM_UNITS,LED_PIN);
+NixiePipe pipes = NixiePipe(NUM_PIPES,NUM_UNITS);
 uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
 uint8_t gHue = 0;
 
@@ -38,6 +38,7 @@ static void nextPattern()
 }
 
 void setup() {
+  pipes.begin<LED_PIN>();
   pipes.clear();
   pipes.setBrightness(BRIGHTNESS); 
   pipes.show();

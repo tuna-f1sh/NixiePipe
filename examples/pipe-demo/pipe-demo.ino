@@ -3,7 +3,7 @@
 #include <NixiePipe.h>
 
 #define LED_PIN       6
-#define NUM_PIPES     5
+#define NUM_PIPES     4
 #define NUM_UNITS     0
 #define BRIGHTNESS    255
 #define FADE_DEC	    20           // Fade effect delay
@@ -29,7 +29,7 @@ static void confetti();
 static void sinelon();
 static void juggle();
 
-NixiePipe pipes = NixiePipe(NUM_PIPES,NUM_UNITS,LED_PIN);
+NixiePipe pipes = NixiePipe(NUM_PIPES,NUM_UNITS);
 
 // List of patterns to cycle through.  Each is defined as a separate function below.
 typedef void (*SimplePatternList[])();
@@ -53,6 +53,8 @@ static void nextPattern()
 void setup() {
   Serial.begin(9600);
   /* pipes.passSerial(Serial);*/
+
+  pipes.begin<LED_PIN>();
   pipes.clear();
   pipes.setBrightness(BRIGHTNESS);
   pipes.setPipeColour(MAIN_COLOUR);
