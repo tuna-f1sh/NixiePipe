@@ -1,7 +1,7 @@
 # General Methodology
 
 The class uses the [FastLED library](https://github.com/FastLED/FastLED) to
-manage the diasy chained WS2812B on each Nixie Pipe PCB. The LEDs are split
+manage the daisy chained WS2812B on each Nixie Pipe PCB. The LEDs are split
 into 'pipes' using pointer offset addressing of 10 LEDs. Each pipe can then
 index the correct LED index for the current number to be displayed.
 
@@ -15,7 +15,7 @@ done until `show` is called; you will not see any changes on the display prior
 to this. As with the FastLED library, consideration must be made to the finite
 time required to transmit to a number of pipes and the fact that interrupts
 are disabled during this period. For this reason, when using Serial
-communication, polling `show` (for fade and rainbow), will cause erractic
+communication, polling `show` (for fade and rainbow), will cause erratic
 communication.
 
 ## Units
@@ -28,7 +28,7 @@ set as `setPipeNumber` using the unit _enum_ as the number. Eg:
 
 `pipes.setPipeNumber(0,Unit::Volts);`
 
-Curret Nixie Pipe unit enums: 'Prefix' (SI prefix), 'Unit' (SI units),
+Current Nixie Pipe unit enums: 'Prefix' (SI prefix), 'Unit' (SI units),
 'Weather' (weather symbols). See 'pipe-units' in the 'examples/' folder.
 
 # Usage
@@ -60,6 +60,15 @@ void loop() {
 	delay(1000);
 }
 ```
+## Constructor and Begin
+
+The constructor (`NixiePipe(uint8_t n = 1, uint8_t units = 0)`) can be
+overloaded with number of pipes _and_ number of units. Number of pipes is
+inclusive of number of units (eg n=4,units=2 would be 2 number pipes and 2
+unit pipes).
+
+Call begin with or without the template LED_PIN. Without passing the
+LED_PIN, it will default to 6 - the pin used on the Nixie Pipe PCB.
 
 # Class Public Functions
 
@@ -67,7 +76,7 @@ Call these functions with your `pipes` object, eg. `pipes.show()`.
 
 ## show(void)
 
-Wrapper for _FastLED_ show. Must be called after function call to make visable
+Wrapper for _FastLED_ show. Must be called after function call to make visible
 change on display.
 
 ## setBrightness(uint8_t brightness)
@@ -106,14 +115,14 @@ Should be called after settings change and before `write`
 
 * param1: Rainbow hue, should be changed between calls.
 
-`write` array rainbow, must be called repeatibly and with hue changing value.
+`write` array rainbow, must be called repeatedly and with hue changing value.
 
 ## writeFade(uint8_t step)
 
 * param1: Step to decrement LEDs other than current number.
 
 As `write` but fades all other LEDs but decrement 'step' each call. Must be
-called repeatibly to create fading effect.
+called repeatedly to create fading effect.
 
 ## setPipeNumber(uint8_t n, uint8_t num)
 
