@@ -3,7 +3,7 @@
 #include <NixiePipe.h>
 
 #define LED_PIN       6
-#define NUM_PIPES     4
+#define NUM_PIPES     6
 #define NUM_UNITS     0
 #define BRIGHTNESS    255
 #define FADE_DEC	    20           // Fade effect delay
@@ -15,7 +15,7 @@
 
 uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
 uint8_t gHue = 0;                  // Rainbow hue inc.
-uint8_t i = 0;                     // Master number inc.
+uint32_t i = 0;                     // Master number inc.
 uint32_t pipesMax = 0;             // Max number pipes can show set by pipes.getMax()
 volatile bool incFlag = false;
 

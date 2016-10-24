@@ -1,3 +1,25 @@
+// MIT License
+
+// Copyright (c) 2016 John Whittington www.jbrengineering.co.uk
+
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef NIXIEPIPE_H
 #define NIXIEPIPE_H
 
@@ -59,57 +81,57 @@ class NixiePipe {
 	template< uint8_t DATA_PIN = 6 > void begin(void) { FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(pixels, numLEDs); }
 
     void
-      show(void), // FastLED show
-      passSerial(HardwareSerial &serial),
-      write(void),
-      writeFade(uint8_t step), // fade to black, write lit LEDs call repeat
-      setPipeNumber(uint8_t n, uint8_t num), // set number but don't clear previous
-      setNumber(uint32_t num), // set number to array
-      writePipeNumber(uint8_t n, uint8_t num), // set and clear previous (set black)
-      writePipeNumber(uint8_t n, uint8_t num, CRGB c), // set and clear with colour
-      setPipeColour(uint8_t n, CRGB c), // set pipe colour
-      setPipeColour(CRGB c), // set pipe colour
-      writeNumber(uint32_t num, CRGB C),
-      writeNumber(uint32_t num),
-      writeSolid(CRGB c), // set pipe colour
-      writeRainbow(uint8_t gHue), // set pipe rainbow
-      writePipeFill(uint8_t n, CRGB c),
-      setBrightness(uint8_t brightness),
-      clearPipe(uint8_t n),
-      clear();
+      show(void), // FastLED show, must be run after each write
+      passSerial(HardwareSerial &serial), // Pass serial object for debug output
+      write(void), // Write settings to pipes
+      writeFade(uint8_t step), // Write settings, fading previous by step decrement (must be run repeatly)
+      setPipeNumber(uint8_t n, uint8_t num), // Set pipe number
+      setNumber(uint32_t num), // Set pipe array number
+      writePipeNumber(uint8_t n, uint8_t num), // Set and write pipe number (clear previous)
+      writePipeNumber(uint8_t n, uint8_t num, CRGB c), // Set and write pipe number with colour (clear previous)
+      setPipeColour(uint8_t n, CRGB c), // Set pipe colour
+      setPipeColour(CRGB c), // Set pipe array colour
+      writeNumber(uint32_t num, CRGB C), // Write new number with new colour (clear previous)
+      writeNumber(uint32_t num), // Write new number (clear previous)
+      writeSolid(CRGB c), // Write new colour
+      writeRainbow(uint8_t gHue), // Write rainbow (gHue should be incremented each call)
+      writePipeFill(uint8_t n, CRGB c), // Write single pipe with new colour
+      setBrightness(uint8_t brightness), // Set array brightness
+      clearPipe(uint8_t n), // Clear single pipe (set black)
+      clear(void); // Clear all pipes
     CRGB
-      *getPixels(void),
-      *getPipePixels(uint8_t n);
+      *getPixels(void), // Return pointer to LEDs
+      *getPipePixels(uint8_t n); // Return pointer to pipe LEDs
     CRGBSet
-      getPipe(uint8_t n);
+      getPipe(uint8_t n); // Return pointer to pipe LED array
     NixiePipe
-      &shift(int8_t n),
-      &operator++(),
-      &operator--(),
+      &shift(int8_t n), // Shift pipe numbers n (+/-) times
+      &operator++(), // Increment pipe array number
+      &operator--(), // Decrement pipe array number
       operator++(int),
       operator--(int);
       // operator+(int rhs);
       // operator-(int rhs);
     uint32_t 
-      getNumber(void),
-      getMax(void);
+      getNumber(void), // Return curret pipe array number
+      getMax(void); // Get maximum display number
     operator int() {return modNum;}
 
   private:
     const uint8_t
-      numPipes,
-      numUnits;
+      numPipes, // Number of pipes (includes units)
+      numUnits; // Number of unit pipes
     uint8_t
-      numLEDs,
-      *pipeNum,
-      brightness;
+      numLEDs, // Number of LEDs
+      *pipeNum, // Array to hold single pipe numbers
+      brightness; // Array brightness
     uint32_t
-      modNum,
-      maxNum;
+      modNum, // Array number
+      maxNum; // Maximum display number
     CRGB 
-      *pixels,
-      *pipeColour;
-    HardwareSerial *pserial;
+      *pixels, // The FastLEDs
+      *pipeColour; // Array to hold single pipe colour
+    HardwareSerial *pserial; // Pointer to passed serial object
 };
 
 #endif // NIXIEPIPE_H
