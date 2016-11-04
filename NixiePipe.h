@@ -72,6 +72,20 @@ typedef enum {
   Ohm
 } Unit;
 
+// Index for weather pipe
+typedef enum {
+  Sun,
+  Rain,
+  Cloud,
+  SunCloud,
+  Snow,
+  Wind,
+  Storm,
+  Fog,
+  Percent,
+  Pascal
+} Weather;
+
 class NixiePipe {
   public: 
 
@@ -98,7 +112,8 @@ class NixiePipe {
       writePipeFill(uint8_t n, CRGB c), // Write single pipe with new colour
       setBrightness(uint8_t brightness), // Set array brightness
       clearPipe(uint8_t n), // Clear single pipe (set black)
-      clear(void); // Clear all pipes
+      clear(void), // Clear all pipes
+      setNumberUnits(uint8_t unit_pipes); // Set number of Nixie Pipe units
     CRGB
       *getPixels(void), // Return pointer to LEDs
       *getPipePixels(uint8_t n); // Return pointer to pipe LEDs
@@ -119,9 +134,9 @@ class NixiePipe {
 
   private:
     const uint8_t
-      numPipes, // Number of pipes (includes units)
-      numUnits; // Number of unit pipes
+      numPipes; // Number of pipes (includes units)
     uint8_t
+      numUnits, // Number of unit pipes
       numLEDs, // Number of LEDs
       *pipeNum, // Array to hold single pipe numbers
       brightness; // Array brightness

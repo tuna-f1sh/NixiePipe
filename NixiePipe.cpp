@@ -259,6 +259,16 @@ CRGBSet NixiePipe::getPipe(uint8_t n) {
   return module;
 }
 
+// Set number of Nixie Pipe units
+void NixiePipe::setNumberUnits(uint8_t unit_pipes) {
+  // Check the number of units is less than total number of pipes
+  if (unit_pipes <= this->numPipes) {
+    this->numUnits = unit_pipes;
+    // Fill maximum displayable number var
+    this->maxNum = powint(10,(numPipes-numUnits)) - 1;
+  }
+}
+
 // (Pre) Increment overload adds 1 to current display
 NixiePipe& NixiePipe::operator++() {
   uint32_t temp = this->modNum;
