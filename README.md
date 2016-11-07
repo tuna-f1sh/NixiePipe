@@ -1,3 +1,20 @@
+# Arduino Library Installation
+
+## Dependancies
+
+* [FastLED library](https://github.com/FastLED/FastLED)
+
+Download or clone this reposity folder into your Arduino libraries folder.
+Restart or open the Arduino IDE and head to File->Examples->NixiePipe for
+example projects.
+
+# Python Package for Serial Firmware (np-serial)
+
+The Python package for use with the serial interpreter firmware is in
+'firmware/np-serial'. Navigate to the folder and install using `./setup.py
+install`. You can test it out with one of the scripts in the 'examples/'
+folder.
+
 # General Methodology
 
 The class uses the [FastLED library](https://github.com/FastLED/FastLED) to

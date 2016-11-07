@@ -3,7 +3,7 @@
 #include <NixiePipe.h>
 
 #define LED_PIN       6
-#define NUM_PIPES     6
+#define NUM_PIPES     8
 #define NUM_UNITS     0
 #define BRIGHTNESS    255
 #define FADE_DEC	    20           // Fade effect delay
