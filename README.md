@@ -10,8 +10,8 @@ example projects.
 
 # Packages for Serial Firmware (np-serial)
 
-* (Python Package)[https://github.com/tuna-f1sh/py-nixiepipe]
-* (Node.js)[https://github.com/tuna-f1sh/node-nixiepipe]
+* [Python Package](https://github.com/tuna-f1sh/py-nixiepipe)
+* [Node.js](https://github.com/tuna-f1sh/node-nixiepipe)
 
 # General Methodology
 
