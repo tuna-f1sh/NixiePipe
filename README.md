@@ -8,12 +8,10 @@ Download or clone this reposity folder into your Arduino libraries folder.
 Restart or open the Arduino IDE and head to File->Examples->NixiePipe for
 example projects.
 
-# Python Package for Serial Firmware (np-serial)
+# Packages for Serial Firmware (np-serial)
 
-The Python package for use with the serial interpreter firmware is in
-'firmware/np-serial'. Navigate to the folder and install using `./setup.py
-install`. You can test it out with one of the scripts in the 'examples/'
-folder.
+* (Python Package)[https://github.com/tuna-f1sh/py-nixiepipe]
+* (Node.js)[https://github.com/tuna-f1sh/node-nixiepipe]
 
 # General Methodology
 

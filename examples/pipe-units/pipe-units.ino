@@ -6,13 +6,14 @@
 #include <NixiePipe.h>
 
 #define LED_PIN       6
-#define NUM_PIPES     4
+#define NUM_PIPES     6
 #define NUM_UNITS     2
 #define BRIGHTNESS    255
 #define FADE_DEC	    32
 #define SEQUENCE_TIME 15      // Time between sequences
 
-#define SAMPLES       64
+#define ADC_CHANNEL   0
+#define SAMPLES       128
 
 #define RAINBOW       false
 #define MAIN_COLOUR   CRGB::White
@@ -45,9 +46,9 @@ void setup() {
 }
 
 void loop() {
-  gPatterns[gCurrentPatternNumber]();
+  /* gPatterns[gCurrentPatternNumber]();*/
   /* temperature();*/
-  /* voltage();*/
+  voltage();
 
   pipes.writeFade(FADE_DEC);
   if (RAINBOW)
@@ -86,11 +87,11 @@ static void temperature(void) {
 }
 
 static void voltage(void) {
-  int32_t volts = analogRead(0);
+  int32_t volts = analogRead(ADC_CHANNEL);
   static int LM[SAMPLES] = {0};      // LastMeasurements
-  static byte index = 0;
+  static int index = 0;
   static long sum = 0;
-  static byte count = 0;
+  static int count = 0;
 
   volts *= 5000;
   volts /= 1024;
