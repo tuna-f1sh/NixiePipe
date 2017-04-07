@@ -1,0 +1,56 @@
+
+# Output folders
+Gerber/
+exports/
+build*
+shapes3d/
+dist/
+*.egg-info
+
+*.bmp
+*.png
+*.ycm*
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+*.pyc
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Temp
+tags
+.tags
+*~
+*.swp
+*DS_Store
+*.pdsbak
+*.workspace
+*.zip
+*CADCAM
+*-bak
+*.bak
+_autosave*
