@@ -1,3 +1,5 @@
+Arduino library for [Nixie Pipe](www.nixiepipe.com) modules, created by [JBR Engineering](www.jbrengineering).
+
 # Arduino Library Installation
 
 ## Dependancies
@@ -180,3 +182,7 @@ Set pipe colour.
 * param1: Serial object to use for debug output
 
 Pass serial object to pipes for debug output.
+
+# License
+
+GPL-3.0 - Please attribute back to this by some means, (link to repo, www.nixiepipe.com or www.jbrengineering.co.uk) if you dervive or clone any portions of the code. Copyright JBR Engineering Research Ltd.
