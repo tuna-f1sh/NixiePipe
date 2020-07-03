@@ -1,4 +1,4 @@
-Arduino library for [Nixie Pipe](www.nixiepipe.com) modules, created by [JBR Engineering](www.jbrengineering).
+Arduino library for [Nixie Pipe](https://www.nixiepipe.com) modules, created by [JBR Engineering](https://www.jbrengineering).
 
 # Arduino Library Installation
 
